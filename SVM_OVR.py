@@ -1,8 +1,6 @@
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
 
 
 class MultiClassSVM:
@@ -60,31 +58,38 @@ class SVM:
         approx = np.dot(X, self.w) - self.b
         return np.sign(approx)
 
-
 # Charger les données d'entraînement
 train_data = pd.read_csv("train.csv")
 test_data = pd.read_csv("test.csv")
 
-# Charger les données de test
-X = train_data.drop(columns=["SNo", "Label"], axis=1)
 columns = ["SNo", "lat", "lon", "TMQ", "U850", "V850", "UBOT", "VBOT", "QREFHT", "PS", "PSL", "T200", "T500", "PRECT",
            "TS", "TREFHT", "Z1000", "Z200", "ZBOT", "time"]
-y = train_data.drop(columns, axis=1)
 
-X = X.values
+# Charger les données de test
+X_train = train_data.drop(columns= ["SNo","Label"], axis = 1)
+X_test = test_data.drop("SNo", axis = 1)
+X_train = X_train.values
+X_test = X_test.values
+
+y = train_data.drop(columns, axis=1)
 y = y.values
-y = y.reshape(1, X.shape[0])
+y = y.reshape(1, X_train.shape[0])
 y = y.reshape(y.shape[1], )
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1234)
+Y_train = y
 
 # Normalisation des données
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
+print("Shape of X_train : ", X_train.shape)
+print("Shape of Y_train : ", Y_train.shape)
+print("Shape of X_test : ", X_test.shape)
+print("\n")
+
 # Entraînement
 classifier = MultiClassSVM(0.001, 0.01, 1000)
-classifier.fit(X_train, y_train)
+classifier.fit(X_train, Y_train)
 
 # Prédictions
 y_pred = classifier.predict(X_test)
@@ -95,5 +100,3 @@ df_predictions = pd.DataFrame({
 })
 
 df_predictions.to_csv('sample_submission.csv', index=False)
-
-print(accuracy_score(y_test, y_pred))
