@@ -1,13 +1,12 @@
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
 
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
 
-class MultiClassSVM:
-
-    def __init__(self, learning_rate, lambda_param, num_iterations):
+class MultiClassLogisticRegression:
+    def __init__(self, learning_rate, num_iterations):
         self.learning_rate = learning_rate
-        self.lambda_param = lambda_param
         self.num_iterations = num_iterations
         self.classifiers = {}
 
@@ -15,8 +14,8 @@ class MultiClassSVM:
         unique_classes = np.unique(y)
 
         for c in unique_classes:
-            binary_y = np.where(y == c, 1, -1)
-            classifier = SVM(self.learning_rate, self.lambda_param, self.num_iterations)
+            binary_y = np.where(y == c, 1, 0)
+            classifier = LogisticRegression(self.learning_rate, self.num_iterations)
             classifier.fit(X, binary_y)
             self.classifiers[c] = classifier
 
@@ -29,35 +28,34 @@ class MultiClassSVM:
 
         return np.argmax(predictions, axis=1)
 
-class SVM:
-
-    def __init__(self, learning_rate, lambda_param, num_iterations):
+class LogisticRegression():
+    def __init__(self, learning_rate, num_iterations):
         self.learning_rate = learning_rate
-        self.lambda_param = lambda_param
         self.num_iterations = num_iterations
         self.w = None
         self.b = None
 
     def fit(self, X, y):
         n_samples, n_features = X.shape
-
         self.w = np.zeros(n_features)
         self.b = 0
 
         for _ in range(self.num_iterations):
-            for idx, x_i in enumerate(X):
-                condition = y[idx] * (np.dot(x_i, self.w) - self.b) >= 1
-                if condition:
-                    self.w -= self.learning_rate * (2 * self.lambda_param * self.w)
-                else:
-                    self.w -= self.learning_rate * (2 * self.lambda_param * self.w - np.dot(x_i, y[idx]))
-                    self.b -= self.learning_rate * y[idx]
+            linear_pred = np.dot(X, self.w) + self.b
+            predictions = sigmoid(linear_pred)
+
+            dw = (1/n_samples) * np.dot(X.T, (predictions - y))
+            db = (1/n_samples) * np.sum(predictions - y)
+
+            self.w -= (self.learning_rate * dw)
+            self.b -= (self.learning_rate * db)
 
     def predict(self, X):
-        approx = np.dot(X, self.w) - self.b
-        return np.sign(approx)
+        linear_pred = np.dot(X, self.w) + self.b
+        y_pred = sigmoid(linear_pred)
+        class_pred = [0 if y <= 0.5 else 1 for y in y_pred]
+        return class_pred
 
-# Charger les données d'entraînement
 train_data = pd.read_csv("train.csv")
 test_data = pd.read_csv("test.csv")
 
@@ -76,10 +74,13 @@ y = y.reshape(1, X_train.shape[0])
 y = y.reshape(y.shape[1], )
 Y_train = y
 
+# Calcul de la moyenne et variance de X_train
+mean = np.mean(X_train, axis=0)
+std = np.std(X_train, axis=0)
+
 # Normalisation des données
-scaler = StandardScaler()
-X_train = scaler.fit_transform(X_train)
-X_test = scaler.transform(X_test)
+X_train = (X_train - mean) / std
+X_test = (X_test - mean) / std
 
 print("Forme de X_train : ", X_train.shape)
 print("Forme de Y_train : ", Y_train.shape)
@@ -87,7 +88,7 @@ print("Forme de X_test : ", X_test.shape)
 print("\n")
 
 # Entraînement
-classifier = MultiClassSVM(10, 0.01, 5000)
+classifier = MultiClassLogisticRegression(0.1, 1000)
 classifier.fit(X_train, Y_train)
 
 # Prédictions
@@ -98,4 +99,4 @@ df_predictions = pd.DataFrame({
     'Label': y_pred
 })
 
-df_predictions.to_csv('sample_submission.csv', index=False)
+df_predictions.to_csv('sample_submission_logreg.csv', index=False)
