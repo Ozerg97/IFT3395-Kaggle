@@ -16,10 +16,10 @@ class CSVComparator:
 
         return similarity
 
-file1 = 'sample_submission_og.csv'  # Replace with the path to your first CSV file
+file1 = 'best_baseline.csv'  # Replace with the path to your first CSV file
 file2 = 'sample_submission_logreg.csv'  # Replace with the path to your second CSV file
 
 comparator = CSVComparator(file1, file2)
 similarity_percentage = comparator.compare()
 
-print(f"The similarity between the two CSV files is: {similarity_percentage}%")
+print(f"The similarity between the two CSV files is: {similarity_percentage} %")

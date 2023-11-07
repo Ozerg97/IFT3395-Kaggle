@@ -88,7 +88,7 @@ print("Forme de X_test : ", X_test.shape)
 print("\n")
 
 # Entraînement
-classifier = MultiClassLogisticRegression(0.1, 1000)
+classifier = MultiClassLogisticRegression(10, 1000)
 classifier.fit(X_train, Y_train)
 
 # Prédictions
