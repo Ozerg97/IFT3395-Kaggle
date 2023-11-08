@@ -1,88 +1,117 @@
 import numpy as np
 import pandas as pd
+#import matplotlib.pyplot as plt
 
-def sigmoid(x):
-    return 1 / (1 + np.exp(-x))
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
 
-class LogisticRegressionMulticlass:
-
-    def __init__(self, num_classes, lr=0.001, n_iters=1000):
-        self.num_classes = num_classes
-        self.lr = lr
-        self.n_iters = n_iters
-        self.models = []
+class MultiClassLogisticRegression:
+    def __init__(self, learning_rate, num_iterations):
+        self.learning_rate = learning_rate
+        self.num_iterations = num_iterations
+        self.classifiers = {}
 
     def fit(self, X, y):
-        n_samples, n_features = X.shape
-        self.models = []
+        unique_classes = np.unique(y)
 
-        for class_label in range(self.num_classes):
-            y_class = (y == class_label).astype(int)
-            model = LogisticRegression(self.lr, self.n_iters)
-            model.fit(X, y_class)
-            self.models.append(model)
+        for c in unique_classes:
+            binary_y = np.where(y == c, 1, 0)
+            classifier = LogisticRegression(self.learning_rate, self.num_iterations)
+            classifier.fit(X, binary_y)
+            self.classifiers[c] = classifier
 
     def predict(self, X):
-        class_preds = []
+        predictions = np.zeros((X.shape[0], len(self.classifiers)))
 
-        for model in self.models:
-            y_pred = model.predict(X)
-            class_preds.append(y_pred)
+        for c, classifier in self.classifiers.items():
+            binary_pred = classifier.predict(X)
+            predictions[:, c] = binary_pred
 
-        return np.array(class_preds).T  # Transposer pour obtenir les prédictions par classe
+        return np.argmax(predictions, axis=1)
 
-class LogisticRegression:
-
-    def __init__(self, lr=0.001, n_iters=1000):
-        self.lr = lr
-        self.n_iters = n_iters
-        self.weights = None
-        self.bias = None
+class LogisticRegression():
+    def __init__(self, learning_rate, num_iterations):
+        self.learning_rate = learning_rate
+        self.num_iterations = num_iterations
+        self.w = None
+        self.b = None
 
     def fit(self, X, y):
         n_samples, n_features = X.shape
-        self.weights = np.zeros(n_features)
-        self.bias = 0
+        self.w = np.zeros(n_features)
+        self.b = 0
 
-        for _ in range(self.n_iters):
-            linear_pred = np.dot(X, self.weights) + self.bias
+        for _ in range(self.num_iterations):
+            linear_pred = np.dot(X, self.w) + self.b
             predictions = sigmoid(linear_pred)
 
-            dw = (1 / n_samples) * np.dot(X.T, (predictions - y))
-            db = (1 / n_samples) * np.sum(predictions - y)
+            dw = (1/n_samples) * np.dot(X.T, (predictions - y))
+            db = (1/n_samples) * np.sum(predictions - y)
 
-            self.weights = self.weights - self.lr * dw
-            self.bias = self.bias - self.lr * db
+            self.w -= (self.learning_rate * dw)
+            self.b -= (self.learning_rate * db)
 
     def predict(self, X):
-        linear_pred = np.dot(X, self.weights) + self.bias
+        linear_pred = np.dot(X, self.w) + self.b
         y_pred = sigmoid(linear_pred)
-        return y_pred
+        class_pred = [0 if y <= 0.5 else 1 for y in y_pred]
+        return class_pred
 
-if __name__ == "__main":
-    # Charger les données d'entraînement et de test (utilisez vos propres chemins de fichiers)
-    train_data = pd.read_csv('/Users/christieembeya/Documents/Automne 2023/IFT 3395 ML/competition kaggle/classification-of-extreme-weather-events-udem/train.csv')
-    test_data = pd.read_csv('/Users/christieembeya/Documents/Automne 2023/IFT 3395 ML/competition kaggle/classification-of-extreme-weather-events-udem/test.csv')
+train_data = pd.read_csv('/Users/christieembeya/Documents/Automne 2023/IFT 3395 ML/competition kaggle/classification-of-extreme-weather-events-udem/train.csv')
+test_data = pd.read_csv('/Users/christieembeya/Documents/Automne 2023/IFT 3395 ML/competition kaggle/classification-of-extreme-weather-events-udem/test.csv')
 
-    # Séparation des caractéristiques et des étiquettes
-    X_train = train_data.drop(columns=["SNo", "Label"], axis=1)
-    Y_train = train_data["Label"]
-    X_test = test_data.drop("SNo", axis=1)
+columns = ["SNo", "lat", "lon", "TMQ", "U850", "V850", "UBOT", "VBOT", "QREFHT", "PS", "PSL", "T200", "T500", "PRECT",
+           "TS", "TREFHT", "Z1000", "Z200", "ZBOT", "time"]
 
-    # Conversion en tableaux NumPy
-    X_train = X_train.to_numpy().T
-    Y_train = Y_train.to_numpy().reshape(1, -1)
-    X_test = X_test.to_numpy().T
+# Charger les données de test
+X_train = train_data.drop(columns= ["SNo","Label"], axis = 1)
+X_test = test_data.drop("SNo", axis = 1)
+X_train = X_train.values
+X_test = X_test.values
 
-    num_classes = 3  # Remplacez par le nombre réel de classes dans vos données
-    num_iterations = 500  # Doit être déterminé par la validation croisée
-    learning_rate = 0.1  # Doit être déterminé par la validation croisée
+y = train_data.drop(columns, axis=1)
+y = y.values
+y = y.reshape(1, X_train.shape[0])
+y = y.reshape(y.shape[1], )
+Y_train = y
 
-    # Initialisez et entraînez le modèle multiclasse
-    model = LogisticRegressionMulticlass(num_classes, lr=learning_rate, n_iters=num_iterations)
-    model.fit(X_train, Y_train)
+# Calcul de la moyenne et variance de X_train
+mean = np.mean(X_train, axis=0)
+std = np.std(X_train, axis=0)
 
-    # Faites des prédictions sur les données de test
-    predictions = model.predict(X_test)
+# Normalisation des données
+X_train = (X_train - mean) / std
+X_test = (X_test - mean) / std
 
-    print(predictions)
+print("Forme de X_train : ", X_train.shape)
+print("Forme de Y_train : ", Y_train.shape)
+print("Forme de X_test : ", X_test.shape)
+print("\n")
+
+# Entraînement
+classifier = MultiClassLogisticRegression(10, 1000)
+classifier.fit(X_train, Y_train)
+
+# Prédictions
+y_pred = classifier.predict(X_test)
+
+
+####################Pour l'affichage des courbes #############
+
+'''plt.figure(figsize=(8, 6))
+plt.scatter(range(len(Y_train)), Y_train, label='étiquettes du train', marker='o', s=10, c='b')
+plt.scatter(range(len(y_pred)), y_pred, label='Prédictions', marker='x', s=10, c='r')
+plt.xlabel('Échantillons')
+plt.ylabel('Étiquettes')
+plt.title('Comparaison des étiquettes du train et des Prédictions')
+plt.legend()
+plt.show()'''
+
+#############################################################
+
+df_predictions = pd.DataFrame({
+    'SNo': range(1, len(y_pred) + 1),  # Commence à 1 et continue jusqu'à la longueur de y_pred
+    'Label': y_pred
+})
+
+df_predictions.to_csv('sample_submission_logreg.csv', index=False)
