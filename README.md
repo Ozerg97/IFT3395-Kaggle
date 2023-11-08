@@ -7,7 +7,7 @@ Nous utilisons les bibliothèque numpy et pandas pour la gestion des données
 Pour afficher les courbes, nous avons utilisé matplotlib qui n'est obligatoire que pour visualiser les résultats que nous avons utilisés pour rédiger notre rapport. 
 
 
-Vous pouvez changer les hyperparamètres learning_rate, num_iterations de la classe MultiClassLogisticRegression
+Vous pouvez changer les hyperparamètres learning_rate et num_iterations de la classe MultiClassLogisticRegression
 <h1>Utilisation</h1>
 
    1. Modifier le chemin d'accès vers les fichiers csv, train.csv et test.csv
