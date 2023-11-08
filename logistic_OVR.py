@@ -5,6 +5,7 @@ import pandas as pd
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
 
+#Implémentation de la régression logistique multiclasse avec l'approche One-vs-Rest
 class MultiClassLogisticRegression:
     def __init__(self, learning_rate, num_iterations):
         self.learning_rate = learning_rate
@@ -29,6 +30,8 @@ class MultiClassLogisticRegression:
 
         return np.argmax(predictions, axis=1)
 
+
+#Implémentation de la régression logistique binaire 
 class LogisticRegression():
     def __init__(self, learning_rate, num_iterations):
         self.learning_rate = learning_rate
@@ -56,6 +59,8 @@ class LogisticRegression():
         y_pred = sigmoid(linear_pred)
         class_pred = [0 if y <= 0.5 else 1 for y in y_pred]
         return class_pred
+
+
 
 train_data = pd.read_csv('/Users/christieembeya/Documents/Automne 2023/IFT 3395 ML/competition kaggle/classification-of-extreme-weather-events-udem/train.csv')
 test_data = pd.read_csv('/Users/christieembeya/Documents/Automne 2023/IFT 3395 ML/competition kaggle/classification-of-extreme-weather-events-udem/test.csv')
