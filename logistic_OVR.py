@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-#import matplotlib.pyplot as plt
 
 def sigmoid(z):
     return 1 / (1 + np.exp(-z))
@@ -101,18 +100,6 @@ classifier.fit(X_train, Y_train)
 y_pred = classifier.predict(X_test)
 
 
-####################Pour l'affichage des courbes #############
-
-'''plt.figure(figsize=(8, 6))
-plt.scatter(range(len(Y_train)), Y_train, label='étiquettes du train', marker='o', s=10, c='b')
-plt.scatter(range(len(y_pred)), y_pred, label='Prédictions', marker='x', s=10, c='r')
-plt.xlabel('Échantillons')
-plt.ylabel('Étiquettes')
-plt.title('Comparaison des étiquettes du train et des Prédictions')
-plt.legend()
-plt.show()'''
-
-#############################################################
 
 df_predictions = pd.DataFrame({
     'SNo': range(1, len(y_pred) + 1),  # Commence à 1 et continue jusqu'à la longueur de y_pred
