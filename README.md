@@ -8,10 +8,12 @@ Pour afficher les courbes, nous avons utilisé matplotlib qui n'est obligatoire 
 <h1>Utilisation</h1>
 
 1. Modifier le chemin d'accès vers les fichiers csv, train.csv et test.csv
-train_data = pd.read_csv('/chemin/vers/train.csv')
+
+   
+   train_data = pd.read_csv('/chemin/vers/train.csv')
 
 
-test_data = pd.read_csv('/chemin/vers/test.csv')
+   test_data = pd.read_csv('/chemin/vers/test.csv')
 
 
 2. En excécutant le code, celui ci effectuera l'entraînement sur l'ensemble d'entraînement et la prédiction sur l'ensemble de test
