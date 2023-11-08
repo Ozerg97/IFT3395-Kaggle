@@ -7,7 +7,8 @@ Pour afficher les courbes, nous avons utilisé matplotlib qui n'est obligatoire 
 1. Modifier le chemin d'accès vers les fichiers csv, train.csv et test.csv
 train_data = pd.read_csv('/chemin/vers/train.csv')
 test_data = pd.read_csv('/chemin/vers/test.csv')
-<hr>
+
+
 2. En excécutant le code, celui ci effectuera les étapes de prétraitement, d'entraînement et de prédiction
 3. Les prédictions faites par le modèles seront sauvegardées dans un fichier CSV appelé sample_submission_logreg.csv
 <h1>Fonctionalités</h1>
