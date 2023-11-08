@@ -1,6 +1,6 @@
 # Régression logistique One-vs-Rest
 Ce travail fournis l'approche One-vs-Rest de la régression logistique
-#Préalable
+<h1>Préalable</h1>
 Bibliothèque numpy et pandas pour la gestion des données
 Pour afficher les courbes, nous avons utilisé matplotlib qui n'est pas obligatoire que pour visualiser les résultats
 #Utilisation
