@@ -4,9 +4,6 @@ Ce travail fournis l'approche One-vs-Rest de la régression logistique
 Nous utilisons les bibliothèque numpy et pandas pour la gestion des données
 
 
-Pour afficher les courbes, nous avons utilisé matplotlib qui n'est obligatoire que pour visualiser les résultats que nous avons utilisés pour rédiger notre rapport. 
-
-
 Vous pouvez changer les hyperparamètres learning_rate et num_iterations de la classe MultiClassLogisticRegression
 <h1>Utilisation</h1>
 
