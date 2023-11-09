@@ -1,40 +1,34 @@
-# importing necessary libraries
 import pandas as pd
-from sklearn import datasets
-from sklearn.metrics import confusion_matrix
-from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
 
-# Charger les données d'entraînement
+# Load training and test data
 train_data = pd.read_csv("train.csv")
 test_data = pd.read_csv("test.csv")
 
-# Charger les données de test
-X = train_data.drop(columns=["SNo", "Label"], axis=1)
-columns = ["SNo", "lat", "lon", "TMQ", "U850", "V850", "UBOT", "VBOT", "QREFHT", "PS", "PSL", "T200", "T500", "PRECT",
-           "TS", "TREFHT", "Z1000", "Z200", "ZBOT", "time"]
-y = train_data.drop(columns, axis=1)
+# Prepare data
+X_train = train_data.drop(columns=["SNo", "Label"], axis=1)
+X_test = test_data.drop("SNo", axis=1)
 
-X = X.values
-y = y.values
-y = y.reshape(1, X.shape[0])
-y = y.reshape(y.shape[1], )
-X_train, X_test, y_train, y_test = train_test_split(X, y)
+y_train = train_data["Label"]
 
-# training a linear SVM classifier
-from sklearn.svm import SVC
+# Normalize data
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
 
-svm_model_linear = SVC(kernel='linear', C=1).fit(X_train, y_train)
-svm_predictions = svm_model_linear.predict(X_test)
+# Train an SVM classifier
+classifier = SVC(kernel='linear', C=1000)
+classifier.fit(X_train, y_train)
 
+# Make predictions on test data
+y_pred = classifier.predict(X_test)
+
+# Create a DataFrame for predictions
 df_predictions = pd.DataFrame({
-    'SNo': range(1, len(svm_predictions) + 1),  # Commence à 1 et continue jusqu'à la longueur de y_pred
-    'Label': svm_predictions
+    'SNo': range(1, len(y_pred) + 1),
+    'Label': y_pred
 })
 
-df_predictions.to_csv('sample_submission.csv', index=False)
-
-# model accuracy for X_test
-accuracy = svm_model_linear.score(X_test, y_test)
-
-# creating a confusion matrix
-cm = confusion_matrix(y_test, svm_predictions)
+# Save predictions to a CSV file
+df_predictions.to_csv('sample_submission_1000.csv', index=False)

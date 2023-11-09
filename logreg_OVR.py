@@ -28,7 +28,7 @@ class MultiClassLogisticRegression:
 
         return np.argmax(predictions, axis=1)
 
-class LogisticRegression():
+class LogisticRegression:
     def __init__(self, learning_rate, num_iterations):
         self.learning_rate = learning_rate
         self.num_iterations = num_iterations
