@@ -99,7 +99,7 @@ print("Forme de X_test : ", X_test.shape)
 print("\n")
 
 # Entraînement
-classifier = MultiClassSVM(0.001, 0.01, 1000) #défaut: 0.001/0.01/1000
+classifier = MultiClassSVM(0.1, 10, 1000) #défaut: 0.001/0.01/1000
 classifier.fit(X_train, Y_train)
 
 # Prédictions
